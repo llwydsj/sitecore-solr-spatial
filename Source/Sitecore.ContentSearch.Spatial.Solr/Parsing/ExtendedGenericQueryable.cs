@@ -1,24 +1,21 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using Sitecore.ContentSearch.Linq.Common;
+﻿using Sitecore.ContentSearch.Linq.Common;
 using Sitecore.ContentSearch.Linq.Indexing;
 using Sitecore.ContentSearch.Linq.Parsing;
 using Sitecore.ContentSearch.Spatial.Solr.Common;
-using Sitecore.ContentSearch.Spatial.Solr.Indexing;
+using System;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Sitecore.ContentSearch.Spatial.Solr.Parsing
 {
     public class ExtendedGenericQueryable<TElement, TQuery> : GenericQueryable<TElement, TQuery>
     {
-        public ExtendedGenericQueryable(Index<TElement, TQuery> index, QueryMapper<TQuery> queryMapper, IQueryOptimizer queryOptimizer, FieldNameTranslator fieldNameTranslator) : 
+        public ExtendedGenericQueryable(Index<TElement, TQuery> index, QueryMapper<TQuery> queryMapper, IQueryOptimizer queryOptimizer, FieldNameTranslator fieldNameTranslator) :
             base(index, queryMapper, queryOptimizer, fieldNameTranslator)
         {
         }
 
-        protected ExtendedGenericQueryable(Index<TQuery> index, QueryMapper<TQuery> queryMapper, IQueryOptimizer queryOptimizer, Expression expression, Type itemType, FieldNameTranslator fieldNameTranslator) : 
+        protected ExtendedGenericQueryable(Index<TQuery> index, QueryMapper<TQuery> queryMapper, IQueryOptimizer queryOptimizer, Expression expression, Type itemType, FieldNameTranslator fieldNameTranslator) :
             base(index, queryMapper, queryOptimizer, expression, itemType, fieldNameTranslator)
         {
         }
@@ -29,11 +26,9 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Parsing
             ((IHasTraceWriter)genericQueryable).TraceWriter = ((IHasTraceWriter)this).TraceWriter;
             return genericQueryable;
         }
-        
+
         protected override TQuery GetQuery(Expression expression)
         {
-            
-
             this.Trace(expression, "Expression");
             IndexQuery indexQuery = new ExtendedExpressionParser(typeof(TElement), this.ItemType, this.FieldNameTranslator).Parse(expression);
             this.Trace(indexQuery, "Raw query:");

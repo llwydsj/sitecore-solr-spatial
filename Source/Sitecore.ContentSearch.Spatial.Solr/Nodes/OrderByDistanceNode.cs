@@ -1,24 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using Sitecore.ContentSearch.Linq.Common;
 using Sitecore.ContentSearch.Linq.Nodes;
+using System.Collections.Generic;
 
 namespace Sitecore.ContentSearch.Spatial.Solr.Nodes
 {
-    public class WithinRadiusNode : QueryNode
+    public class OrderByDistanceNode : OrderByNode
     {
-        public WithinRadiusNode(QueryNode sourceNode, string field, double lat, double lon, int radius)
+        public OrderByDistanceNode(QueryNode sourceNode, string field, double lat, double lon)
+            : base(sourceNode, field, typeof(double), SortDirection.Ascending)
         {
-            SourceNode = sourceNode;
-            Field = field;
             Lat = lat;
             Lon = lon;
-            Radius = radius;
         }
 
-        public QueryNode SourceNode { get; protected set; }
-        public string Field { get; protected set; }
         public double Lat { get; protected set; }
         public double Lon { get; protected set; }
-        public int Radius { get; protected set; }
 
         public override QueryNodeType NodeType => QueryNodeType.Custom;
 
@@ -29,6 +25,5 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Nodes
                 yield return SourceNode;
             }
         }
-
     }
 }

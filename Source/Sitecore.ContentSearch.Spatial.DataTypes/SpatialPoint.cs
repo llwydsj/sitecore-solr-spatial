@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Sitecore.ContentSearch.Spatial.DataTypes
 {
@@ -10,19 +7,32 @@ namespace Sitecore.ContentSearch.Spatial.DataTypes
     {
         public SpatialPoint()
         {
-            
         }
 
         public SpatialPoint(string value)
         {
-            if (value == null) throw new ArgumentNullException("value");
+            if (value == null)
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
             RawValue = value;
             var tokens = value.Split(',');
-            if (tokens.Length != 2) throw  new ArgumentException("incorrect spatial point format. Value must be supplied in the following format lat,lon");
+            if (tokens.Length != 2)
+            {
+                throw new ArgumentException(
+                    "incorrect spatial point format. Value must be supplied in the following format lat,lon");
+            }
             var strLat = tokens[0].Trim();
             var strLon = tokens[1].Trim();
             Lat = double.Parse(strLat);
             Lon = double.Parse(strLon);
+        }
+
+        public SpatialPoint(double latitude, double longitude)
+        {
+            Lat = latitude;
+            Lon = longitude;
+            RawValue = $"{latitude},{longitude}";
         }
 
         protected string RawValue { get; set; }

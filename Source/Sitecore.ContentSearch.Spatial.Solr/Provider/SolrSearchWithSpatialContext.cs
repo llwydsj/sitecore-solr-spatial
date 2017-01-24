@@ -9,7 +9,6 @@ using Sitecore.ContentSearch.SolrProvider;
 using Sitecore.ContentSearch.Spatial.Solr.Indexing;
 using Sitecore.ContentSearch.Utilities;
 using Sitecore.Diagnostics;
-using Sitecore.Pipelines;
 
 namespace Sitecore.ContentSearch.Spatial.Solr.Provider
 {
@@ -25,22 +24,22 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Provider
         public SolrSearchWithSpatialContext(SolrSearchIndex index, SearchSecurityOptions options = SearchSecurityOptions.EnableSecurityCheck)
             : base(index, options)
         {
-            Assert.ArgumentNotNull((object)index, "index");
-            Assert.ArgumentNotNull((object)options, "options");
+            Assert.ArgumentNotNull(index, "index");
+            Assert.ArgumentNotNull(options, "options");
             this.index = index;
-            this.contentSearchSettings = this.index.Locator.GetInstance<IContentSearchConfigurationSettings>();
-            this.settings = this.index.Locator.GetInstance<ISettings>();
-            this.securityOptions = options;
+            contentSearchSettings = this.index.Locator.GetInstance<IContentSearchConfigurationSettings>();
+            settings = this.index.Locator.GetInstance<ISettings>();
+            securityOptions = options;
         }
 
         public new IQueryable<TItem> GetQueryable<TItem>()
         {
-            return this.GetQueryable<TItem>(new IExecutionContext[0]);
+            return GetQueryable<TItem>(new IExecutionContext[0]);
         }
 
         public new IQueryable<TItem> GetQueryable<TItem>(IExecutionContext executionContext)
         {
-            return this.GetQueryable<TItem>(new IExecutionContext[1]
+            return GetQueryable<TItem>(new IExecutionContext[1]
               {
                 executionContext
               });
@@ -49,14 +48,14 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Provider
         public new IQueryable<TItem> GetQueryable<TItem>(params IExecutionContext[] executionContexts)
         {
             var linqToSolrIndex = new LinqToSolrIndexWithSpatial<TItem>(this, executionContexts);
-            if (this.contentSearchSettings.EnableSearchDebug())
+            if (contentSearchSettings.EnableSearchDebug())
                 ((IHasTraceWriter)linqToSolrIndex).TraceWriter = new LoggingTraceWriter(SearchLog.Log);
 
             var queryable = linqToSolrIndex.GetQueryable();
             if (typeof(TItem).IsAssignableFrom(typeof(SearchResultItem)))
             {
                 var globalFiltersArgs = new QueryGlobalFiltersArgs(linqToSolrIndex.GetQueryable(), typeof(TItem), executionContexts.ToList());
-                this.Index.Locator.GetInstance<ICorePipeline>().Run("contentSearch.getGlobalLinqFilters", globalFiltersArgs);
+                Index.Locator.GetInstance<ICorePipeline>().Run("contentSearch.getGlobalLinqFilters", globalFiltersArgs);
                 queryable = (IQueryable<TItem>)globalFiltersArgs.Query;
             }
             return queryable;

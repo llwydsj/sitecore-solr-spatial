@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Web;
 
 namespace Sitecore.ContentSearch.Spatial.DataTypes.Converters
 {
@@ -11,30 +8,24 @@ namespace Sitecore.ContentSearch.Spatial.DataTypes.Converters
     {
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            if (sourceType == typeof(SpatialPoint))
-                return true;
-            else
-                return base.CanConvertFrom(context, sourceType);
+            return sourceType == typeof(SpatialPoint) || base.CanConvertFrom(context, sourceType);
         }
 
         public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
         {
-            if (destinationType == typeof(string))
-                return true;
-            else
-                return base.CanConvertTo(context, destinationType);
+            return destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
         }
 
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            if ((value is string))
-                return new SpatialPoint((string)value);
-            return new SpatialPoint();
+            var s = value as string;
+            return s != null ? new SpatialPoint(s) : new SpatialPoint();
         }
 
-        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value,
+            Type destinationType)
         {
-            return ((SpatialPoint)value).ToString();
+            return ((SpatialPoint) value).ToString();
         }
     }
 }

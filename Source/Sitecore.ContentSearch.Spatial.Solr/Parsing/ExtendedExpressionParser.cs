@@ -27,8 +27,9 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Parsing
             switch (methodCall.Method.Name)
             {
                 case "WithinRadius":
-                    var queryNode = this.VisitWithinRadiusMethod(methodCall);
-                    return queryNode;
+                    return this.VisitWithinRadiusMethod(methodCall);
+                case "OrderByDistance":
+                    return this.VisitOrderByDistanceMethod(methodCall);
             }
             return base.VisitQueryableExtensionMethod(methodCall);
         }
@@ -64,6 +65,27 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Parsing
             }
         }
 
-       
+        protected virtual QueryNode VisitOrderByDistanceMethod(MethodCallExpression methodCall)
+        {
+            var sourceNode = this.Visit(GetArgument(methodCall.Arguments, 0));
+            var lambdaExpression = Convert<LambdaExpression>(StripQuotes(GetArgument(methodCall.Arguments, 1)));
+            var latExpression = (ConstantExpression) GetArgument(methodCall.Arguments, 2);
+            var lonExpression = (ConstantExpression) GetArgument(methodCall.Arguments, 3);
+            var lat = (double) latExpression.Value;
+            var lon = (double) lonExpression.Value;
+
+            if (lambdaExpression.Body.NodeType == ExpressionType.MemberAccess)
+            {
+                var queryNode = Visit(lambdaExpression.Body);
+                var fieldNode = queryNode as FieldNode;
+
+                if (fieldNode != null)
+                {
+                    return new OrderByDistanceNode(sourceNode, fieldNode.FieldKey, lat, lon);
+                }
+            }
+            
+            return base.VisitOrderByMethod(methodCall);
+        }
     }
 }
